@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+    <device guid="0001">
+        <general>
+            <address>192.168.1.100</address>
+            <port>5555</port>
+            <user>user01</user>
+            <password>password01</password>
+        </general>
+        <variables>
+            <variable name="var1" type="string"></variable>
+            <variable name="var2" type="int"></variable>
+            <variable name="var3" type="double"></variable>
+            <variable name="var4" type="string"></variable>
+        </variables>
+        <functions>
+            <function name="connect">
+                <metod>POST</metod>
+            </function>
+            <function name="getTemperature">
+                <metod>POST</metod>
+                <url>192.168.1.101</url>
+                <pattern>GET001</pattern>
+                <result>
+                     <before>TRIM.ENCODE</before>
+                     <parsing>SPLIT(;).TOMAP(=)</parsing>
+                </result>
+            </function>
+            <function name="setAlarmTemperature">
+                <url>192.168.1.101</url>
+                <pattern>SetAllarm[var2]</pattern>
+            </function>
+        </functions>
+    </device>
+    <device guid="0002">
+
+    </device>
+</configuration>
