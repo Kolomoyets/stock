@@ -22,10 +22,10 @@ public class HttpHelper {
             xml = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document doc = xml.parse(url);
             Element element = doc.getDocumentElement();
-            LOG.debug("Load url="+ url);
+            LOG.debug("Load url=" + url);
             return element;
         } catch (ParserConfigurationException | SAXException | IOException e) {
-            LOG.error(e);
+            LOG.error(url, e);
         }
         return null;
     }

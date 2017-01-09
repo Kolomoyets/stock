@@ -161,7 +161,7 @@ public class MoexTest {
             codeMap.put(code, res);
         }
 
-        Map<String, MoexInfo> map = MoexHelp.loadHistoryEnginesMarketsBoardsListing(codeMap, 0, 500, 5);
+        Map<String, MoexInfo> map = MoexHelp.loadHistoryEnginesMarketsBoardsListing(codeMap, 0, 500, threadCount);
         assertTrue(map.size() > 0);
     }
 
@@ -183,7 +183,7 @@ public class MoexTest {
             codeMap.put(s2, res);
         }
 
-        Map<String, MoexInfo> map = MoexHelp.loadHistoryEnginesMarketsBoardgroupsListing(codeMap, 0, 500, 5);
+        Map<String, MoexInfo> map = MoexHelp.loadHistoryEnginesMarketsBoardgroupsListing(codeMap, 0, 500, threadCount);
         assertTrue(map.size() > 0);
     }
 
@@ -196,36 +196,42 @@ public class MoexTest {
         assertTrue(map.size() > 0);
     }
 
+    @Test
+    public void loadEnginesMarketsOrderbookTest() {
+        MoexHelp.loadEnginesMarketsOrderbook();
+    }
+
+    private Map<String, Map<String, String>> codeMap() {
+        MoexInfo infoBoards = moex.get("markets");
+        List<String> strings = infoBoards.getValueGroup("trade_engine_name", "market_name");
+        Map<String, Map<String, String>> codeMap = new HashMap<String, Map<String, String>>();
+        for (String s : strings) {
+            String s2 = s.replace("trade_engine_name=", "engine=");
+            s2 = s2.replace("market_name=", "market=");
+            Map<String, String> res = ServerHelper.String2Map(s2);
+            codeMap.put(s2, res);
+        }
+        return codeMap;
+    }
 
     @Test
     public void loadEnginesMarketsSecuritiesTest() {
-        MoexInfo infoBoards = moex.get("markets");
-        List<String> strings = infoBoards.getValueGroup("trade_engine_name", "market_name");
-        Map<String, Map<String, String>> codeMap = new HashMap<String, Map<String, String>>();
-        for (String s : strings) {
-            String s2 = s.replace("trade_engine_name=", "engine=");
-            s2 = s2.replace("market_name=", "market=");
-            Map<String, String> res = ServerHelper.String2Map(s2);
-            codeMap.put(s2, res);
-        }
-        Map<String, Moex> map = MoexHelp.loadEnginesMarketsSecurities(MoexType.ACTUAL,codeMap, 5);
+        Map<String, Map<String, String>> codeMap = codeMap();
+        Map<String, Moex> map = MoexHelp.loadEnginesMarketsSecurities(MoexType.ACTUAL, MoexObjectType.SECURITIES, codeMap, threadCount);
         assertTrue(map.size() > 0);
     }
 
-
-
     @Test
     public void loadHistoryEnginesMarketsSecuritiesTest() {
-        MoexInfo infoBoards = moex.get("markets");
-        List<String> strings = infoBoards.getValueGroup("trade_engine_name", "market_name");
-        Map<String, Map<String, String>> codeMap = new HashMap<String, Map<String, String>>();
-        for (String s : strings) {
-            String s2 = s.replace("trade_engine_name=", "engine=");
-            s2 = s2.replace("market_name=", "market=");
-            Map<String, String> res = ServerHelper.String2Map(s2);
-            codeMap.put(s2, res);
-        }
-        Map<String, Moex> map = MoexHelp.loadEnginesMarketsSecurities(MoexType.HISTORY,codeMap, 5);
+        Map<String, Map<String, String>> codeMap = codeMap();
+        Map<String, Moex> map = MoexHelp.loadEnginesMarketsSecurities(MoexType.HISTORY, MoexObjectType.SECURITIES, codeMap, threadCount);
+        assertTrue(map.size() > 0);
+    }
+
+    @Test
+    public void loadEnginesMarketsTradesTest() {
+        Map<String, Map<String, String>> codeMap = codeMap();
+        Map<String, Moex> map = MoexHelp.loadEnginesMarketsSecurities(MoexType.ACTUAL, MoexObjectType.TRADES, codeMap, threadCount);
         assertTrue(map.size() > 0);
     }
 

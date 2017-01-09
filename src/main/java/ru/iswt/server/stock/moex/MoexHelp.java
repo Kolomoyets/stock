@@ -498,13 +498,21 @@ public class MoexHelp {
         return map;
     }
 
-    ///iss/engines/[engine]/markets/[market]/.*?orderbook/columns
+    // To obtain a description of the fields for requests for quotes for market
+    // (Получить описание полей для запросов стакана котировок для рынка)
+    // /iss/engines/[engine]/markets/[market]/.*?orderbook/columns
     public static void loadEnginesMarketsOrderbook() {
 
     }
 
+   /*
+    * A description of fields for queries published by the securities market
+    * (Получить описание полей для запросов публикуемых бумаг для рынка)
+    * /iss/engines/[engine]/markets/[market]/.*?securities/columns
+    *
+    * */
 
-    static Map<String, Moex> loadEnginesMarketsSecurities(MoexType type, Map<String, Map<String, String>> codeMap, int threadCount) {
+    static Map<String, Moex> loadEnginesMarketsSecurities(MoexType type, MoexObjectType moexObjectType, Map<String, Map<String, String>> codeMap, int threadCount) {
         Map<String, Moex> res = new HashMap<>();
         List<Thread> threads = new ArrayList<>();
         for (String code : codeMap.keySet()) {
@@ -513,7 +521,7 @@ public class MoexHelp {
             String market = map.get("market");
 
             Thread thread = new Thread(() -> {
-                Moex moex = loadEnginesMarketsSecurities(MoexType.ACTUAL, engine, market);
+                Moex moex = loadEnginesMarketsSecurities(type, moexObjectType, engine, market);
                 res.put(code, moex);
             });
             thread.setName("t_" + ServerHelper.getSession());
@@ -534,8 +542,19 @@ public class MoexHelp {
     * /iss/history/engines/[engine]/markets/[market]/.*?securities/columns
     */
 
-    public static Moex loadEnginesMarketsSecurities(MoexType type, String engine, String market) {
-        String pattern = "http://www.micex.ru/iss/engines/[engine]/markets/[market]/securities/columns.xml";
+    public static Moex loadEnginesMarketsSecurities(MoexType type, MoexObjectType moexObjectType, String engine, String market) {
+        String pattern = "http://www.micex.ru/iss/" + type.getUrlQuery() + "engines/[engine]/markets/[market]/" + moexObjectType.getUrlQuery() + "/columns.xml";
+        String url = pattern.replace("[engine]", engine).replace("[market]", market);
+        Moex moex = new Moex();
+        List<MoexInfo> list = moex.parseXml(url);
+        moex.setMoexInfoList(list);
+        moex.relocate();
+        return moex;
+    }
+
+
+    public static Moex loadEnginesMarkets(MoexType type, String engine, String market) {
+        String pattern = "http://www.micex.ru/iss/engines/[engine]/markets/[market]";
         if (type == MoexType.HISTORY) {
             pattern = "http://www.micex.ru/iss/history/engines/[engine]/markets/[market]/securities/columns.xml";
         }
@@ -546,6 +565,9 @@ public class MoexHelp {
         moex.relocate();
         return moex;
     }
+
+
+    //   /iss/engines/[engine]/markets/[market]/.*?trades/columns
 
 
 }

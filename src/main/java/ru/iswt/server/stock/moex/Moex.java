@@ -37,10 +37,12 @@ public class Moex {
      */
     public List<MoexInfo> parseXml(String url) {
         List<MoexInfo> list = new ArrayList<>();
-
         Element root = HttpHelper.parse(url);
-        List<Node> nodes = findNodes(root, "data");
+        if (root == null) {
+            return list;
+        }
 
+        List<Node> nodes = findNodes(root, "data");
         for (Node node : nodes) {
             MoexInfo moexInfo = new MoexInfo();
             moexInfo.setId(getAttributesValue(node, "id"));
@@ -377,7 +379,7 @@ public class Moex {
                 LOG.debug("time all=" + (a3 - a0) + ", pos=" + pos + ",limit=" + limit);
             } while (row > 1);
 
-            if (moexInfo.getRows()!=null) {
+            if (moexInfo.getRows() != null) {
                 moexInfoList.add(moexInfo);
             }
         } catch (Exception e) {
